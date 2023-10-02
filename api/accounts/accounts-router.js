@@ -16,8 +16,8 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', md.checkAccountId, async (req, res, next) => {
   // DO YOUR MAGIC
   try{
-    
-    res.json(req.account)
+   const account = await Account.getById(req.params.id) 
+    res.json(account)
   }catch (err) {
     next(err)
   }
@@ -29,7 +29,10 @@ md.checkAccountNameUnique,
 async (req, res, next) => {
   // DO YOUR MAGIC
   try {
-    const newAccount = await Account.create(req.body)
+    const newAccount = await Account.create({
+      name: req.body.name.trim(),
+    budget: req.body.budget,
+    })
 res.status(201).json(newAccount)
   }catch (err) {
     next(err)
@@ -39,8 +42,9 @@ res.status(201).json(newAccount)
 router.put('/:id', 
 md.checkAccountId, 
 md.checkAccountPayload,
-md.checkAccountNameUnique, (req, res, next) => {
-  // DO YOUR MAGIC
+ async (req, res, next) => {
+  const updated = await Account.updateById(req.params.id, req.body)
+  res.json(updated)
   try {
 res.json('update accounts')
   }catch (err) {
